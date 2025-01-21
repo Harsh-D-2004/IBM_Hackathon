@@ -11,8 +11,8 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:5173"])
 
-IMGTXT_API_KEY = "0ZMGeZzTgJ_lY9izPitQh4uXzeIr02Z9RSgVIq7YhpVO"
-DEPLOYMENT_URL = "https://us-south.ml.cloud.ibm.com/ml/v4/deployments/97db027d-1bea-447a-89d4-253d1a011dff/predictions?version=2021-05-01"
+IMGTXT_API_KEY = "nYYAxPcGBT61ooih3eYUputXmnjKfwymfcn1SDFYkpOh"
+DEPLOYMENT_URL = "https://us-south.ml.cloud.ibm.com/ml/v4/deployments/f05a33f0-70a5-4dbf-9de8-80b16508051e/predictions?version=2021-05-01"
 
 def get_ibm_token():
     token_response = requests.post(
@@ -22,10 +22,12 @@ def get_ibm_token():
     return token_response.json().get("access_token")
 
 def preprocess_image(image_file):
-    image = Image.open(io.BytesIO(image_file.read())).convert("L")
-    image = image.resize((28, 28))
-    img_array = np.array(image).flatten().tolist()
-    return img_array
+    img = Image.open(image_file).convert('L')
+    img_resized = img.resize((28, 28))
+    img_array = np.array(img_resized) / 255.0  
+    img_reshaped = img_array.reshape(28, 28, 1)
+    img_list = img_reshaped.tolist()
+    return img_list
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -48,7 +50,10 @@ def predict():
     
     response_json = response_scoring.json()
     probabilities = response_json["predictions"][0]["values"][0]
-    predicted_class = np.argmax(probabilities)
+    # predicted_class = int(np.argmax(probabilities))
+    max_index = int(np.argmax(probabilities))
+    predicted_class = chr(max_index + 65)
+    # prediction_score = probabilities[max_index]
     
     return jsonify({"predicted_class": predicted_class})
 
