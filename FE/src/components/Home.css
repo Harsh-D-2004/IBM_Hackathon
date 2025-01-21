@@ -1,0 +1,112 @@
+/* General styles for the home page */
+.home-container {
+    font-family: 'OpenDyslexic', Arial, sans-serif; /* Font for dyslexic accessibility */
+    background-color: white; /* Light background for better readability */
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1000px; /* Use full viewport height */
+    padding: 20px;
+    width:1850px;
+  }
+  
+  /* Header rectangle style */
+  .header-rectangle {
+    background-color: #e8f4fc;
+    border-radius: 15px;
+    padding: 40px 20px;
+    height:700px;
+    width: 100%; /* Adjust for responsiveness */
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    margin-top:30px;
+
+  }
+  
+  /* Title styles */
+  .home-title {
+    font-size: 2rem;
+    color: black; /* Soothing blue for accessibility */
+    margin-bottom: 30px;
+  }
+  
+  /* Content container */
+  .content-container {
+    margin-bottom: 30px;
+  }
+  
+  /* Description text */
+  .description p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin: 0 0 20px 0;
+    color: black;
+  }
+  
+  /* Image Preview */
+  .image-preview {
+    margin-top: 20px;
+  }
+  
+  .preview-image {
+    width: 600px;
+    height: 600px;
+ /* Adjust the image size */
+    height: auto;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Loading Spinner */
+  .loading-spinner {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: black;
+  }
+  
+  /* Upload Status Feedback */
+  .upload-status {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    padding: 10px;
+    border-radius: 5px;
+    width:300px;
+    text-align:center;
+    margin-left:760px;
+  }
+  
+  .upload-status.success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .upload-status.failure {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  /* Upload button */
+  .upload-button {
+    font-size: 1.1rem;
+    padding: 12px 20px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+    margin-left:660px;
+  }
+  
+  .upload-button:hover {
+    background-color: grey;
+  }
+  
+  .upload-button:focus {
+    outline: 2px solid grey;
+    outline-offset: 2px;
+  }
+  

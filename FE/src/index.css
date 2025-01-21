@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@font-face {
+    font-family: 'OpenDyslexic';
+    src: url('./fonts/OpenDyslexic-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'OpenDyslexic';
+    src: url('./fonts/OpenDyslexic-Bold.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'OpenDyslexic';
+    src: url('./fonts/OpenDyslexicAlta-BoldItalic.otf') format('opentype');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'OpenDyslexic Mono';
+    src: url('./fonts/OpenDyslexicMono-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+.open-dyslexic-font {
+    font-family: 'OpenDyslexic', sans-serif;
+}
+
+.open-dyslexic-bold {
+    font-family: 'OpenDyslexic', sans-serif;
+    font-weight: bold;
+}
+
+.open-dyslexic-bold-italic {
+  font-family: 'OpenDyslexic', sans-serif;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.open-dyslexic-mono {
+   font-family: 'OpenDyslexic Mono', monospace;
+}
