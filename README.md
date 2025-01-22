@@ -5,7 +5,8 @@ This project is for IBM SkillsBuild hackathon conducted from 13 jan 2024 to 31 j
 
 ## Contributors
 - Harsh Doshi  hdoshi319@gmail.com
-- Saniya Gupte  
+- Saniya Gupte  saniyamilindgupte@gmail.com
+- Mentor : Sonam Aslekar
 
 ## Folder Structure
 
