@@ -1,12 +1,24 @@
 import React, { useState, useRef } from "react";
 import "../index.css";
+import {
+  Button,
+  Card,
+  CardMedia,
+  Typography,
+  CircularProgress,
+  Container,
+  Grid2,
+  Box,
+  CardContent,
+} from "@mui/material";
+import { styled } from "@mui/system";
 
 const Home = () => {
   const [activeTab, setActiveTab] = useState("handwriting");
   const [predictedText, setPredictedText] = useState("");
   const [audioUrl, setAudioUrl] = useState(null);
   const [pronunciationData, setPronunciationData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [audioFile, setAudioFile] = useState(null);
@@ -14,19 +26,23 @@ const Home = () => {
   const audioInputRef = useRef(null);
   const [uploadingAudio, setUploadingAudio] = useState(false);
   const [audioPreviewUrl, setAudioPreviewUrl] = useState(null);
+  const [isLoadingImage, setIsLoadingImage] = React.useState(false);
+  const [isLoadingVoice, setIsLoadingVoice] = React.useState(false);
+  const [isLoadingPronunciation, setIsLoadingPronunciation] =
+    React.useState(false);
 
   const handleImageUpload = async (event) => {
     console.log("handleImageUpload started");
-    setIsLoading(true);
     setImagePreview(null);
     setPredictedText("");
     setAudioUrl(null);
     setPronunciationData(null);
+    setIsLoadingImage(true);
 
     const file = event.target.files[0];
     if (!file) {
       console.log("No file selected");
-      setIsLoading(false);
+      setIsLoadingImage(false);
       return;
     }
 
@@ -40,36 +56,37 @@ const Home = () => {
     formData.append("image", file);
 
     try {
-      console.log("Sending image to server...");
-      const response = await fetch("http://localhost:5000/predict", {
-        method: "POST",
-        body: formData,
-      });
-      console.log("Response Received");
+      //   console.log("Sending image to server...");
+      //   const response = await fetch("http://localhost:5000/predict", {
+      //     method: "POST",
+      //     body: formData,
+      //   });
+      //   console.log("Response Received");
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("HTTP error during prediction:", errorData);
-        throw new Error(
-          `HTTP error! status: ${response.status} - ${JSON.stringify(
-            errorData
-          )}`
-        );
-      }
+      //   if (!response.ok) {
+      //     const errorData = await response.json();
+      //     console.error("HTTP error during prediction:", errorData);
+      //     throw new Error(
+      //       `HTTP error! status: ${response.status} - ${JSON.stringify(
+      //         errorData
+      //       )}`
+      //     );
+      //   }
 
-      const data = await response.json();
-      console.log("Prediction result:", data);
-      setPredictedText(data.predicted_class || '');
+      //   const data = await response.json();
+      //   console.log("Prediction result:", data);
+      // setPredictedText(data.predicted_class || "");
+      setPredictedText("N" || "");
     } catch (error) {
       console.error("Error during prediction:", error);
       alert("Failed to get prediction, please see console for more details");
     } finally {
-      setIsLoading(false);
+      setIsLoadingImage(false);
       console.log("handleImageUpload completed");
     }
   };
   const handleGetPronunciation = async (predictedChar) => {
-    setIsLoading(true);
+    setIsLoadingPronunciation(true);
     try {
       console.log("Starting handleGetPronunciation");
       const response = await fetch("http://localhost:5000/pronounce", {
@@ -100,13 +117,13 @@ const Home = () => {
         "Failed to fetch pronunciation, please see console for more details"
       );
     } finally {
-      setIsLoading(false);
+      setIsLoadingPronunciation(false);
       console.log("handleGetPronunciation completed");
     }
   };
 
   const handleGetVoice = async (predictedChar) => {
-    setIsLoading(true);
+    setIsLoadingVoice(true);
     try {
       console.log("Starting handleGetVoice");
       const response = await fetch("http://localhost:5000/synthesize", {
@@ -138,34 +155,32 @@ const Home = () => {
       alert("Failed to fetch audio, please see console for more details");
       setAudioUrl(null);
     } finally {
-      setIsLoading(false);
+      setIsLoadingVoice(false);
       console.log("handleGetVoice completed");
     }
   };
 
   const playAudio = async () => {
-  if (!audioUrl) {
-    console.error("Audio URL not set");
-    return;
-  }
+    if (!audioUrl) {
+      console.error("Audio URL not set");
+      return;
+    }
 
-  let fullAudioUrl = audioUrl;
+    let fullAudioUrl = audioUrl;
+    if (!audioUrl.startsWith("http") && !audioUrl.startsWith("blob:")) {
+      fullAudioUrl = `http://localhost:5000${audioUrl}`;
+    }
 
-  // Check if audioUrl is relative, then add the base URL
-  if (!audioUrl.startsWith("http") && !audioUrl.startsWith("blob:")) {
-    fullAudioUrl = `http://localhost:5000${audioUrl}`;
-  }
+    console.log("Full Audio URL:", fullAudioUrl);
 
-  console.log("Full Audio URL:", fullAudioUrl);
-
-  try {
-    const audio = new Audio(fullAudioUrl);
-    await audio.play();
-  } catch (error) {
-    console.error("Error playing audio:", error);
-    alert("Failed to load audio. Please check the file format or URL.");
-  }
-};
+    try {
+      const audio = new Audio(fullAudioUrl);
+      await audio.play();
+    } catch (error) {
+      console.error("Error playing audio:", error);
+      alert("Failed to load audio. Please check the file format or URL.");
+    }
+  };
 
   const handleAudioUpload = (event) => {
     const file = event.target.files[0];
@@ -175,12 +190,10 @@ const Home = () => {
   };
   const handleSendVoice = async () => {
     console.log("Starting handleSendVoice");
-    setIsLoading(true);
     setUploadingAudio(true);
     if (!audioFile) {
       console.log("No audio file selected");
       alert("Please select an audio file.");
-      setIsLoading(false);
       setUploadingAudio(false);
       return;
     }
@@ -225,185 +238,465 @@ const Home = () => {
       console.log(
         `Transcript: ${highestConfidenceWord}, Confidence: ${highestConfidence}`
       );
-      // console.log("Transcription result:", data);
       setTranscribedText(highestConfidenceWord);
     } catch (error) {
       console.error("Error during transcription:", error);
       alert("Failed to transcribe audio, please see console for more details");
     } finally {
-      setIsLoading(false);
       setUploadingAudio(false);
       console.log("handleSendVoice completed");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 flex flex-col items-center justify-center py-8 px-4 font-sans open-dyslexic-font">
-      <div className="absolute top-4 left-4">
-        <h1 className="text-6xl font-extrabold text-black open-dyslexic-bold-italic">
-          Learning Made Easy
-        </h1>
-      </div>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "#FFF8E1",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "space-between",
+        fontFamily: "'Poppins', sans-serif",
+      }}
+    >
+      {/* Header */}
+      <Box
+        sx={{
+          width: "100%",
+          background: "#E65100",
+          padding: "16px",
+          textAlign: "center",
+        }}
+      >
+        <Typography
+          variant="h2"
+          sx={{
+            fontWeight: 700,
+            fontFamily: "'OpenDyslexic', sans-serif",
+            color: "#FFFFFF",
+          }}
+        >
+          DYSLEXILEARN
+        </Typography>
+      </Box>
 
-      <div className="w-full max-w-4xl bg-white shadow-lg rounded-xl p-8 space-y-8 mt-16">
-        <header className="text-center space-y-4">
-          <h2 className="text-3xl font-bold text-gray-700 open-dyslexic-bold">
-            Choose Your Learning Method
-          </h2>
-        </header>
-
-        <div className="tabs flex justify-center space-x-8 mb-6">
-          <button
+      {/* Main Content */}
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: "800px",
+          background: "#FFFFFF",
+          borderRadius: "16px",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+          padding: "24px",
+          margin: "16px",
+        }}
+      >
+        <Box
+          sx={{
+            fontFamily: "'OpenDyslexic', sans-serif",
+            display: "flex",
+            justifyContent: "center",
+            gap: "16px",
+            marginBottom: "24px",
+          }}
+        >
+          <Button
+            variant={activeTab === "handwriting" ? "contained" : "outlined"}
+            sx={{
+              background:
+                activeTab === "handwriting" ? "#FFA726" : "transparent",
+              color: "#000000",
+              border:
+                activeTab === "handwriting" ? "none" : "1px solid #FFA726",
+              "&:hover": {
+                background: "#FB8C00",
+              },
+              fontFamily: "'OpenDyslexic', sans-serif",
+            }}
             onClick={() => setActiveTab("handwriting")}
-            className={`px-6 py-2 text-lg font-medium rounded-t-lg transition-colors ${
-              activeTab === "handwriting"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-blue-600"
-            }`}
           >
             Handwriting Analysis
-          </button>
-          <button
+          </Button>
+          <Button
+            variant={activeTab === "voice" ? "contained" : "outlined"}
+            sx={{
+              background: activeTab === "voice" ? "#FFA726" : "transparent",
+              color: "#000000",
+              border: activeTab === "voice" ? "none" : "1px solid #FFA726",
+              "&:hover": {
+                background: "#FB8C00",
+              },
+              fontFamily: "'OpenDyslexic', sans-serif",
+            }}
             onClick={() => setActiveTab("voice")}
-            className={`px-6 py-2 text-lg font-medium rounded-t-lg transition-colors ${
-              activeTab === "voice"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-blue-600"
-            }`}
           >
             Voice Synthesis
-          </button>
-        </div>
+          </Button>
+        </Box>
 
         {activeTab === "handwriting" && (
-          <div className="space-y-6">
-            <div className="text-center flex flex-col items-center">
+          <Grid2 container spacing={4}>
+            {/* Image Upload and Preview */}
+            <Grid2 item xs={6}>
               {imagePreview && (
-                <div className="mb-4">
-                  <img
-                    src={imagePreview}
-                    alt="Uploaded"
-                    style={{ maxWidth: "200px" }}
-                  />
-                </div>
+                <CardMedia
+                  component="img"
+                  image={imagePreview}
+                  alt="Uploaded"
+                  sx={{
+                    borderRadius: "8px",
+                    objectFit: "contain",
+                    width: "100%",
+                    maxHeight: "200px",
+                  }}
+                />
               )}
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
                 ref={fileInputRef}
-                style={{ display: "none" }}
+                hidden
               />
-              <button
+              <Button
+                variant="contained"
+                sx={{
+                  background: "#FFA726",
+                  color: "#000000",
+                  "&:hover": {
+                    background: "#FB8C00",
+                  },
+                  marginTop: "16px",
+                  fontFamily: "'OpenDyslexic', sans-serif",
+                }}
                 onClick={() => fileInputRef.current.click()}
-                className="px-6 py-2 text-lg font-medium rounded-lg bg-purple-600 text-white open-dyslexic-bold"
-                disabled={isLoading}
+                disabled={isLoadingImage}
               >
-                {isLoading ? "Loading..." : "Upload Image"}
-              </button>
-
-              {predictedText && (
-                <h3 className="text-2xl font-semibold text-gray-700 mt-4 open-dyslexic-mono">
-                  Predicted Text: {predictedText}
-                </h3>
-              )}
-            </div>
-
-            {predictedText && (
-              <div className="text-center mt-6">
-                <button
-                  onClick={() => handleGetVoice(predictedText)}
-                  className="px-6 py-2 text-lg font-medium rounded-lg bg-blue-600 text-white open-dyslexic-bold"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Loading..." : "Get Voice"}
-                </button>
-                <button
-                  onClick={() => handleGetPronunciation(predictedText)}
-                  className="mt-2 px-6 py-2 text-lg font-medium rounded-lg bg-blue-600 text-white open-dyslexic-bold"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Loading..." : "Get Pronunciation"}
-                </button>
-              </div>
-            )}
-
-            {audioUrl ? (
-              <div className="mt-4 text-center">
-                <button
-                  className="px-6 py-2 text-lg font-medium rounded-lg bg-green-600 text-white open-dyslexic-bold"
-                  onClick={playAudio}
-                >
-                  Play Audio
-                </button>
-                {pronunciationData && (
-                  <div>
-                    <button
-                      className="mt-2 px-6 py-2 text-lg font-medium rounded-lg bg-green-600 text-white open-dyslexic-bold"
-                      onClick={() => alert(pronunciationData)} // Display the value of setPronunciation
-                    >
-                      Show Pronunciation
-                    </button>
-                    {pronunciationData && (
-                      <p className="mt-2 text-center text-gray-500">
-                        {pronunciationData}{" "}
-                        {/* Display the value of setPronunciation */}
-                      </p>
-                    )}
-                  </div>
+                {isLoadingImage ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  "Upload Image"
                 )}
-              </div>
-            ) : (
-              <p className="mt-4 text-center text-gray-500">
-                Audio is not available yet.
-              </p>
-            )}
-          </div>
+              </Button>
+            </Grid2>
+
+            {/* Predicted Text and Results */}
+            <Grid2 item xs={6}>
+              {predictedText && (
+                <Box
+                  sx={{
+                    background: "#F5F5F5",
+                    borderRadius: "8px",
+                    padding: "16px",
+                    textAlign: "center",
+                    fontFamily: "'OpenDyslexic', sans-serif",
+                  }}
+                >
+                  <Card
+                    sx={{
+                      padding: "24px",
+                      background:
+                        "linear-gradient(135deg, #FFF5E1 30%, #FFDAB9 100%)",
+                      borderRadius: "16px",
+                      boxShadow: "0px 6px 12px rgba(0,0,0,0.15)",
+                      borderLeft: "8px solid #FF8C42",
+                      maxWidth: "600px",
+                      margin: "20px auto",
+                      fontFamily: "'OpenDyslexic', sans-serif",
+                      textAlign: "center",
+                    }}
+                  >
+                    <CardContent>
+                      <Typography
+                        variant="h5"
+                        sx={{
+                          fontWeight: "bold",
+                          color: "#000000",
+                          marginBottom: "8px",
+                          textTransform: "uppercase",
+                          letterSpacing: "1px",
+                          fontFamily: "'OpenDyslexic', sans-serif"
+                        }}
+                      >
+                        Predicted Text
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: "#333333",
+                          fontSize: "1.2rem",
+                          fontStyle: "italic",
+                          padding: "12px",
+                          backgroundColor: "#ffffff",
+                          borderRadius: "8px",
+                          boxShadow: "inset 0px 4px 8px rgba(0,0,0,0.1)",
+                          fontFamily: "'OpenDyslexic', sans-serif"
+                        }}
+                      >
+                        {predictedText}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+
+                  {/* Get Voice and Get Pronunciation Buttons */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: "8px",
+                      justifyContent: "center",
+                      marginTop: "16px",
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      sx={{
+                        background: "#FFA726",
+                        color: "#000000",
+                        "&:hover": {
+                          background: "#FB8C00",
+                        },
+                        fontFamily: "'OpenDyslexic', sans-serif",
+                      }}
+                      onClick={() => handleGetVoice(predictedText)}
+                      disabled={isLoadingVoice}
+                    >
+                      {isLoadingVoice ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        "Get Voice"
+                      )}
+                    </Button>
+                    <Button
+                      variant="contained"
+                      sx={{
+                        background: "#FFA726",
+                        color: "#000000",
+                        "&:hover": {
+                          background: "#FB8C00",
+                        },
+                        fontFamily: "'OpenDyslexic', sans-serif",
+                      }}
+                      onClick={() => handleGetPronunciation(predictedText)}
+                      disabled={isLoadingPronunciation}
+                    >
+                      {isLoadingPronunciation ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        "Get Pronunciation"
+                      )}
+                    </Button>
+                  </Box>
+
+                  {/* Results for Get Voice */}
+                  {audioUrl && (
+                    <Box sx={{ marginTop: "16px" }}>
+                      <Button
+                        variant="contained"
+                        sx={{
+                          background: "#4CAF50",
+                          color: "#000000",
+                          "&:hover": {
+                            background: "#388E3C",
+                          },
+                          fontFamily: "'OpenDyslexic', sans-serif",
+                        }}
+                        onClick={playAudio}
+                      >
+                        Play Audio
+                      </Button>
+                    </Box>
+                  )}
+
+                  {/* Results for Get Pronunciation */}
+                  {pronunciationData && (
+                    <Box sx={{ marginTop: "16px" }}>
+                      <Box
+                        sx={{
+                          background: "#FFFFFF",
+                          borderRadius: "8px",
+                          border: "2px solid #FFA726",
+                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                          padding: "16px",
+                          textAlign: "center",
+                        }}
+                      >
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontFamily: "'OpenDyslexic', sans-serif",
+                            color: "#000000",
+                            fontWeight: 700,
+                          }}
+                        >
+                          Pronunciation
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            fontFamily: "'OpenDyslexic', sans-serif",
+                            fontSize: "1.2rem",
+                            color: "#000000",
+                            marginTop: "8px",
+                          }}
+                        >
+                          {pronunciationData}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  )}
+                </Box>
+              )}
+            </Grid2>
+          </Grid2>
         )}
 
         {activeTab === "voice" && (
-          <div className="mt-4 flex flex-col items-center">
-            <h3 className="text-2xl font-semibold text-gray-700 open-dyslexic-bold">
-              Upload your recorded voice file
-            </h3>
-            {audioPreviewUrl && (
-              <audio src={audioPreviewUrl} controls className="mt-2" />
-            )}
-            <input
-              type="file"
-              accept="audio/*"
-              onChange={handleAudioUpload}
-              ref={audioInputRef}
-              style={{ display: "none" }}
-            />
-            <button
-              className="px-6 py-2 text-lg font-medium rounded-lg bg-blue-600 text-white open-dyslexic-bold"
-              onClick={() => audioInputRef.current.click()}
-              disabled={isLoading}
-            >
-              {isLoading ? "Loading..." : "Upload Recording"}
-            </button>
+          <Grid2 container spacing={4}>
+            <Grid2 item xs={6}>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: "#000000",
+                  textAlign: "center",
+                  fontFamily: "'OpenDyslexic', sans-serif",
+                }}
+              >
+                Upload your recorded voice file
+              </Typography>
+              {audioPreviewUrl && (
+                <audio
+                  src={audioPreviewUrl}
+                  controls
+                  style={{ marginTop: "16px", width: "100%" }}
+                />
+              )}
+              <input
+                type="file"
+                accept="audio/*"
+                onChange={handleAudioUpload}
+                ref={audioInputRef}
+                hidden
+              />
+              <Button
+                variant="contained"
+                sx={{
+                  background: "#FFA726",
+                  color: "#000000",
+                  "&:hover": {
+                    background: "#FB8C00",
+                  },
+                  marginTop: "16px",
+                  fontFamily: "'OpenDyslexic', sans-serif",
+                }}
+                onClick={() => audioInputRef.current.click()}
+                disabled={isLoadingImage}
+              >
+                {isLoadingImage ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  "Upload Recording"
+                )}
+              </Button>
 
-            <button
-              className="mt-4 px-6 py-2 text-lg font-medium rounded-lg bg-blue-600 text-white open-dyslexic-bold"
-              onClick={handleSendVoice}
-              disabled={isLoading || uploadingAudio}
-            >
-              {uploadingAudio ? "Uploading..." : "Send Voice"}
-            </button>
-
-            {transcribedText && (
-              <div className="mt-4 text-center open-dyslexic-mono">
-                <h3 className="text-xl font-semibold text-gray-700">
-                  Transcription:
-                </h3>
-                <p>{transcribedText}</p>
-              </div>
-            )}
-          </div>
+              {/* Send Voice Button */}
+              <Button
+                variant="contained"
+                sx={{
+                  background: "#FFA726",
+                  color: "#000000",
+                  "&:hover": {
+                    background: "#FB8C00",
+                  },
+                  marginTop: "16px",
+                  marginLeft: "16px",
+                  fontFamily: "'OpenDyslexic', sans-serif",
+                }}
+                onClick={handleSendVoice}
+                disabled={uploadingAudio}
+              >
+                {uploadingAudio ? <CircularProgress size={24} /> : "Send Voice"}
+              </Button>
+            </Grid2>
+            <Grid2 item xs={6}>
+              <Box
+                sx={{
+                  background: "#F5F5F5",
+                  borderRadius: "8px",
+                  padding: "16px",
+                  textAlign: "center",
+                  fontFamily: "'OpenDyslexic', sans-serif",
+                }}
+              >
+                {/* Transcription Result */}
+                {transcribedText && (
+                  <Card
+                    sx={{
+                      padding: "20px",
+                      backgroundColor: "#FFF5E1",
+                      borderRadius: "16px",
+                      boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
+                      borderLeft: "8px solid #FF8C42",
+                      maxWidth: "600px",
+                      margin: "auto",
+                      fontFamily: "'OpenDyslexic', sans-serif",
+                    }}
+                  >
+                    <CardContent>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "#000",
+                          fontWeight: "bold",
+                          marginBottom: "8px",
+                          fontFamily: "'OpenDyslexic', sans-serif",
+                        }}
+                      >
+                        Transcription
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: "#333",
+                          fontSize: "1.1rem",
+                          lineHeight: "1.6",
+                        }}
+                      >
+                        {transcribedText}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                )}
+              </Box>
+            </Grid2>
+          </Grid2>
         )}
-      </div>
-    </div>
+      </Box>
+
+      {/* Footer */}
+      <Box
+        sx={{
+          width: "100%",
+          background: "#E65100", // Dark orange
+          padding: "16px",
+          textAlign: "center",
+        }}
+      >
+        <Typography
+          variant="body1"
+          sx={{
+            fontFamily: "'OpenDyslexic', sans-serif",
+            color: "#FFFFFF", // White text
+          }}
+        >
+          Terms and Conditions:
+          <br />
+          This project is for educational purposes only. Rights Reserved with
+          the developers of this project
+        </Typography>
+      </Box>
+    </Box>
   );
 };
 
