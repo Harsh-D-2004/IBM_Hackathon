@@ -1,11 +1,12 @@
 # DyslexiLearn
 
 This repository contains the source code and resources for our dyslexia assistance software, which helps individuals by providing OCR-based text recognition, pronunciation assistance, and speech-to-text transcription.
-This project is for IBM SkillsBuild hackathon conducted from 13 jan 2024 to 31 jan 2024
+This project is for IBM SkillsBuild Hackathon conducted from 13 Jan 2025 to 31 Jan 2025
 
 ## Contributors
 - Harsh Doshi  hdoshi319@gmail.com
-- Saniya Gupte  
+- Saniya Gupte  saniyamilindgupte@gmail.com
+- Mentor : Sonam Aslekar
 
 ## Folder Structure
 
