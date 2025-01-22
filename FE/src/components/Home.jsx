@@ -56,27 +56,27 @@ const Home = () => {
     formData.append("image", file);
 
     try {
-      //   console.log("Sending image to server...");
-      //   const response = await fetch("http://localhost:5000/predict", {
-      //     method: "POST",
-      //     body: formData,
-      //   });
-      //   console.log("Response Received");
+        console.log("Sending image to server...");
+        const response = await fetch("http://localhost:5000/predict", {
+          method: "POST",
+          body: formData,
+        });
+        console.log("Response Received");
 
-      //   if (!response.ok) {
-      //     const errorData = await response.json();
-      //     console.error("HTTP error during prediction:", errorData);
-      //     throw new Error(
-      //       `HTTP error! status: ${response.status} - ${JSON.stringify(
-      //         errorData
-      //       )}`
-      //     );
-      //   }
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("HTTP error during prediction:", errorData);
+          throw new Error(
+            `HTTP error! status: ${response.status} - ${JSON.stringify(
+              errorData
+            )}`
+          );
+        }
 
-      //   const data = await response.json();
-      //   console.log("Prediction result:", data);
-      // setPredictedText(data.predicted_class || "");
-      setPredictedText("N" || "");
+        const data = await response.json();
+        console.log("Prediction result:", data);
+      setPredictedText(data.predicted_class || "");
+      // setPredictedText("N" || "");
     } catch (error) {
       console.error("Error during prediction:", error);
       alert("Failed to get prediction, please see console for more details");

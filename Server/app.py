@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 import numpy as np
 import requests
 from PIL import Image
-import io
 from ibm_watson import TextToSpeechV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_watson import SpeechToTextV1
@@ -50,10 +49,8 @@ def predict():
     
     response_json = response_scoring.json()
     probabilities = response_json["predictions"][0]["values"][0]
-    # predicted_class = int(np.argmax(probabilities))
     max_index = int(np.argmax(probabilities))
     predicted_class = chr(max_index + 65)
-    # prediction_score = probabilities[max_index]
     
     return jsonify({"predicted_class": predicted_class})
 
