@@ -6,7 +6,6 @@ import {
   CardMedia,
   Typography,
   CircularProgress,
-  Container,
   Grid2,
   Box,
   CardContent,
@@ -18,7 +17,6 @@ const Home = () => {
   const [predictedText, setPredictedText] = useState("");
   const [audioUrl, setAudioUrl] = useState(null);
   const [pronunciationData, setPronunciationData] = useState(null);
-  // const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [audioFile, setAudioFile] = useState(null);
